@@ -18,6 +18,12 @@ app.use(session({
     }
 }));
 
+try {
+    sessionStore.sync({ force: true }).then(() => console.log("DB connected"));
+  } catch (err) {
+    console.log(err);
+  }
+
 app.get('/', (req, res) => {
     // console.log(req.session);
 

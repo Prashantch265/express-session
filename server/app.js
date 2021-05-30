@@ -1,34 +1,61 @@
-const express = require('express');
-const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const sequelize = require('../database/models/index');
+const express = require("express");
+const session = require("express-session");
+const SessionStore = require('express-session-sequelize')(session.Store);
+const passport = require("passport");
+const sequelize = require("../database/models/index");
+const pageRoute = require("./routes/page.route");
+const authRoute = require("./routes/auth.route");
 
 const app = express();
 
-const sessionStore = new SequelizeStore({db: sequelize});
+const sequelizeSessionStore = new SessionStore({
+  db: sequelize,
+});
 
-app.use(session({
+// const sessionStore = new pgSession({tableName: "Sessions"});
+
+require("./lib/passport")(passport);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
     secret: "YOUR_SECRET",
-    store: sessionStore,
+    store: sequelizeSessionStore,
     saveUninitialized: false,
     resave: false,
     ssl: true,
-    cookie:{
-        maxAge: 1000 * 60 //1 min
-    }
-}));
+    cookie: {
+      maxAge: 1000 * 60, //1 min
+    },
+  })
+);
 
-app.get('/', (req, res) => {
-    // console.log(req.session);
+/**
+ * Notice that these middlewares are initialized after the `express-session` middleware.  This is because
+ * Passport relies on the `express-session` middleware and must have access to the `req.session` object.
+ * 
+ * passport.initialize() - This creates middleware that runs before every HTTP request.  It works in two steps: 
+ *      1. Checks to see if the current session has a `req.session.passport` object on it.  This object will be
+ *          
+ *          { user: '<Mongo DB user ID>' }
+ * 
+ *      2.  If it finds a session with a `req.session.passport` property, it grabs the User ID and saves it to an 
+ *          internal Passport method for later.
+ *  
+ * passport.session() - This calls the Passport Authenticator using the "Session Strategy".  Here are the basic
+ * steps that this method takes:
+ *      1.  Takes the user ID obtained from the `passport.initialize()` method (run directly before) and passes
+ *          it to the `passport.deserializeUser()` function (defined above in this module).  The `passport.deserializeUser()`
+ *          function will look up the User by the given ID in the database and return it.
+ *      2.  If the `passport.deserializeUser()` returns a user object, this user object is assigned to the `req.user` property
+ *          and can be accessed within the route.  If no user is returned, nothing happens and `next()` is called.
+ */
+app.use(passport.initialize());
+app.use(passport.session());
 
-    if(req.session.viewCount){
-        req.session.viewCount++;
-    }else{
-        req.session.viewCount = 1;
-    }
-
-    res.send(`Page is visited for ${req.session.viewCount} time`);
-});
-
+app.set("view engine", "ejs");
+app.use("/", pageRoute);
+app.use("/auth", authRoute);
 
 module.exports = app;

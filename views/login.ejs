@@ -49,7 +49,7 @@
                             <h3 class="text-center text-info">Login</h3>
                             <div class="form-group">
                                 <label for="username" class="text-info">E-mail:</label><br>
-                                <input type="text" name="username" id="username" class="form-control" name="email">
+                                <input type="text" name="email" id="username" class="form-control" name="email">
                             </div>
                             <div class="form-group">
                                 <label for="password" class="text-info">Password:</label><br>
@@ -66,6 +66,15 @@
                         </form>
                     </div>
                 </div>
+                <%if(locals.err){%>
+                    <div>
+                        <%= err.msg %>
+                    </div>
+                    <% }else{ %>
+                        <div style="margin: 5; color: #8BC34A;">
+                            <%= locals.msg %>
+                        </div>
+                        <% } %>
             </div>
         </div>
     </div>

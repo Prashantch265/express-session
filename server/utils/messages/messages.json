@@ -1,0 +1,16 @@
+{
+    "successMsg": {
+        "create": "%s created successfully",
+        "get": "%s fetched sucessfully",
+        "update": "%s updated successfully",
+        "delete": "%s deleted successfully"
+    },
+    "errorMsg": {
+        "invalidBody": "Cannot process request body.",
+        "usernameNotAvailable": "Username is not available.Choose another username.",
+        "notAuthorized": "You are not authorized to access this resource.",
+        "notFound": "Data not found.",
+        "duplicateData": "Duplicate Data found",
+        "tokenExpired": "Access Token has expired."
+    }
+}

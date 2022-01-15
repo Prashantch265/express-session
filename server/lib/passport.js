@@ -9,6 +9,28 @@ const authCtrl = require("../controller/auth.controller");
  * `req.session.passport` object.
  */
 module.exports = (passport) => {
+  //  * This function is used in conjunction with the `passport.authenticate()` method.
+  passport.serializeUser(function (user, cb) {
+    cb(null, user.uid);
+  });
+
+  /**
+   * This function is used in conjunction with the `app.use(passport.session())` middleware defined below.
+   * Scroll down and read the comments in the PASSPORT AUTHENTICATION section to learn how this works.
+   *
+   * In summary, this method is "set" on the passport object and is passed the user ID stored in the `req.session.passport`
+   * object later on.
+   */
+  passport.deserializeUser(function (uid, cb) {
+    authCtrl.findUser(uid, function (err, user) {
+      if (err) {
+        return cb(err);
+      }
+      cb(null, user);
+    });
+  });
+
+  
   passport.use(
     new LocalStrategy((email, password, cb) => {
       authCtrl
@@ -23,25 +45,4 @@ module.exports = (passport) => {
         .catch((err) => cb(err, null));
     })
   );
-
-  //  * This function is used in conjunction with the `passport.authenticate()` method.
-  passport.serializeUser(function (user, cb) {
-    cb(null, user.id);
-  });
-
-  /**
-   * This function is used in conjunction with the `app.use(passport.session())` middleware defined below.
-   * Scroll down and read the comments in the PASSPORT AUTHENTICATION section to learn how this works.
-   *
-   * In summary, this method is "set" on the passport object and is passed the user ID stored in the `req.session.passport`
-   * object later on.
-   */
-  passport.deserializeUser(function (id, cb) {
-    authCtrl.findUser(id, function (err, user) {
-      if (err) {
-        return cb(err);
-      }
-      cb(null, user);
-    });
-  });
 };

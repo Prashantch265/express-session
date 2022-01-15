@@ -1,0 +1,14 @@
+{
+    "keep": {
+        "days": false,
+        "amount": 30
+    },
+    "auditLog": "/home/prashant/Documents/node.js/express-session/server/logs/debug/.c4563220bba74e6c286ff48a386f76c28b876fd8-audit.json",
+    "files": [
+        {
+            "date": 1631089702508,
+            "name": "/home/prashant/Documents/node.js/express-session/server/logs/debug/2021-09-08.log",
+            "hash": "8f6e026e5b9d841ca79450990bd1e6a9"
+        }
+    ]
+}

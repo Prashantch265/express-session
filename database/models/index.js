@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const config = require("../config/config.json");
+const config = require("../../config/config.json");
 
 const sequelize = new Sequelize(
   config.development.database,
@@ -8,11 +8,11 @@ const sequelize = new Sequelize(
   {
     host: config.development.host,
     dialect: config.development.dialect,
-    pool:{
+    pool: {
       max: 5,
       min: 0,
-      idle: 10000
-    }
+      idle: 10000,
+    },
   }
 );
 

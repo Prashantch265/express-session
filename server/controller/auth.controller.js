@@ -12,6 +12,14 @@ const signup = async (req, res) => {
       throw errors;
     }
 
+    let currentUser = await User.findOne({
+      where: { email: email },
+    });
+
+    if (currentUser) {
+      return res.status(400).json("user already existed");
+    }
+
     let user = User.build({
       name,
       email,
@@ -26,7 +34,7 @@ const signup = async (req, res) => {
 
     let message = "Successfully signed up!";
 
-    return res.status(200).render("register.ejs", { msg: message });
+    return res.redirect(200, "/login");
   } catch (err) {
     console.log(err);
     return res.status(400).render("register.ejs", { err: err });
@@ -40,7 +48,7 @@ const signin = async (email, password) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      throw errors;
+      throw { errors: "Incorrect Email or Password"};
     }
 
     let user = await User.findOne({
@@ -65,9 +73,9 @@ const signin = async (email, password) => {
   }
 }
 
-const findUser = async (id) => {
+const findUser = async (uid) => {
     try {
-        let user = await User.findOne({where: {id: id}});
+        let user = await User.findOne({where: {uid: uid}});
 
         return user;
     } catch (err) {
@@ -75,4 +83,20 @@ const findUser = async (id) => {
     }
 }
 
-module.exports = {signup, signin, findUser};
+const isAuth = (req, res, next) => {
+  if (req.isAuthenticated()) {
+      next();
+  } else {
+      res.status(401).json({ msg: 'You are not authorized to view this resource' });
+  }
+}
+
+const isAdmin = (req, res, next) => {
+  if (req.isAuthenticated() && req.user.admin) {
+      next();
+  } else {
+      res.status(401).json({ msg: 'You are not authorized to view this resource because you are not an admin.' });
+  }
+}
+
+module.exports = {signup, signin, findUser, isAuth, isAdmin};
